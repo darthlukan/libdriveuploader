@@ -24,7 +24,7 @@ def get_folder(client, foldername):
     return folder
 
 
-def upload(config, filename, foldername):
+def upload(config, filename, foldername, mimetype):
     client = make_client(config)
     folder = get_folder(client, foldername)
     if folder is not None:
@@ -32,9 +32,9 @@ def upload(config, filename, foldername):
             name = filename.split('/')[-1]
         else:
             name = filename
-        doc = gdata.docs.data.Resource(type='text/csv', title=name)
+        doc = gdata.docs.data.Resource(type=mimetype, title=name)
         media = gdata.data.MediaSource()
-        media.set_file_handle(filename, 'text/csv')
+        media.set_file_handle(filename, mimetype)
         result = client.CreateResource(doc, media=media, collection=folder)
         return result
     return None
@@ -44,10 +44,11 @@ def main():
     config = json.load(sys.argv[1])
     filename = sys.argv[2]
     foldername = sys.argv[3]
+    mimetype = sys.argv[4]
     client = make_client(config)
     folder = get_folder(client, foldername)
     if folder is not None:
-        result = upload(config, filename, foldername)
+        result = upload(config, filename, foldername, mimetype)
     else:
         result = None
     return result
